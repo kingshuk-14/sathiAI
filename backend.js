@@ -60,6 +60,55 @@ app.post('/api/huggingface/chat/completions', async (req, res) => {
   }
 })
 
+// Unified API Endpoint (matches Vercel serverless function)
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { messages, model, max_tokens, temperature } = req.body
+    const apiKey = process.env.VITE_LLM_API_KEY
+
+    if (!apiKey) {
+      return res.status(400).json({ error: 'API key not configured' })
+    }
+
+    if (!messages || messages.length === 0) {
+      return res.status(400).json({ error: 'Messages are required' })
+    }
+
+    console.log('Forwarding to HuggingFace Router...')
+
+    const response = await fetch('https://router.huggingface.co/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: model || 'mistralai/Mistral-7B-Instruct-v0.2',
+        messages: messages,
+        temperature: temperature || 0.7,
+        max_tokens: max_tokens || 1000
+      })
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('HuggingFace API error:', response.status, errorText)
+      return res.status(response.status).json({ 
+        error: `HuggingFace API error: ${response.status}`,
+        details: errorText 
+      })
+    }
+
+    const data = await response.json()
+    console.log('HuggingFace response received')
+
+    res.json(data)
+  } catch (error) {
+    console.error('Backend error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' })

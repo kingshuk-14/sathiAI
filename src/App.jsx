@@ -4,7 +4,7 @@ import Tesseract from 'tesseract.js'
 const App = () => {
   // Configuration - no need to expose API key to frontend
   // Backend handles API calls securely
-  const API_ENDPOINT = '/api/huggingface/chat/completions'
+  const API_ENDPOINT = '/api/chat'
 
   // State management
   const [showApp, setShowApp] = useState(false)
