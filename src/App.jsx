@@ -7,6 +7,7 @@ const App = () => {
   const API_ENDPOINT = '/api/huggingface/chat/completions'
 
   // State management
+  const [showApp, setShowApp] = useState(false)
   const [inputText, setInputText] = useState('')
   const [extractedText, setExtractedText] = useState('')
   const [loading, setLoading] = useState(false)
@@ -610,10 +611,86 @@ ${text}
 
   return (
     <div style={styles.container}>
+      {!showApp ? (
+        // LANDING PAGE
+        <div style={styles.landingPage}>
+          <div style={styles.landingContent}>
+            <img src="/logo.png" alt="sathiAI" style={styles.landingLogo} />
+            <h1 style={styles.landingTitle}>sathiAI</h1>
+            <p style={styles.landingTagline}>Protect yourself from scams</p>
+            
+            <div style={styles.landingInstructions}>
+              <h2 style={styles.instructionsTitle}>How to Use sathiAI</h2>
+              
+              <div style={styles.instructionCard}>
+                <div style={styles.stepNumber}>1</div>
+                <div>
+                  <h3 style={styles.instructionCardTitle}>Upload or Paste</h3>
+                  <p style={styles.instructionCardText}>
+                    Upload a screenshot of a confusing message or paste the text directly
+                  </p>
+                </div>
+              </div>
+
+              <div style={styles.instructionCard}>
+                <div style={styles.stepNumber}>2</div>
+                <div>
+                  <h3 style={styles.instructionCardTitle}>Click Analyze</h3>
+                  <p style={styles.instructionCardText}>
+                    Let AI analyze the message for potential scams or important information
+                  </p>
+                </div>
+              </div>
+
+              <div style={styles.instructionCard}>
+                <div style={styles.stepNumber}>3</div>
+                <div>
+                  <h3 style={styles.instructionCardTitle}>Get Clear Answers</h3>
+                  <p style={styles.instructionCardText}>
+                    Read simple explanations about whether it's safe, what it means, and what to do
+                  </p>
+                </div>
+              </div>
+
+              <div style={styles.instructionCard}>
+                <div style={styles.stepNumber}>4</div>
+                <div>
+                  <h3 style={styles.instructionCardTitle}>Stay Safe</h3>
+                  <p style={styles.instructionCardText}>
+                    Never click suspicious links or share personal information based on alerts
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style={styles.warningBox}>
+              <strong>Remember:</strong> Always call your bank, doctor, or official organization directly using numbers from official sources - never use numbers from messages.
+            </div>
+
+            <button 
+              onClick={() => setShowApp(true)}
+              style={styles.startButton}
+            >
+              Start Using sathiAI
+            </button>
+          </div>
+        </div>
+      ) : (
+        // MAIN APP
+        <>
       {/* Header with Logo */}
       <div style={styles.navbar}>
-        <img src="/logo.png" alt="sathiAI" style={styles.logo} />
-        <h1 style={styles.heading}>sathiAI</h1>
+        <div style={{ flex: 1 }}></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <img src="/logo.png" alt="sathiAI" style={styles.logo} />
+          <h1 style={styles.heading}>sathiAI</h1>
+        </div>
+        <button 
+          onClick={() => setShowApp(false)}
+          style={styles.backButton}
+        >
+          ← Back to Home
+        </button>
       </div>
       <p style={styles.subtitle}>
         Get help understanding confusing text messages, notices, and alerts
@@ -784,6 +861,8 @@ ${text}
           </p>
         </div>
       )}
+        </>
+      )}
     </div>
   )
 }
@@ -797,12 +876,140 @@ const styles = {
     fontFamily: '"Georgia", "Garamond", serif',
     fontSize: '18px'
   },
-  navbar: {
+  // Landing Page Styles
+  landingPage: {
+    minHeight: '100vh',
+    backgroundColor: '#F5F1E8',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '15px',
+    padding: '40px 20px'
+  },
+  landingContent: {
+    maxWidth: '700px',
+    textAlign: 'center',
+    backgroundColor: '#FAF8F3',
+    padding: '60px 40px',
+    borderRadius: '4px',
+    boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+    border: '1px solid #E8E3D8'
+  },
+  landingLogo: {
+    height: '100px',
+    width: '100px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+    border: '3px solid #DAA520',
     marginBottom: '20px'
+  },
+  landingTitle: {
+    fontSize: '56px',
+    fontWeight: '300',
+    color: '#3D3D3D',
+    marginBottom: '8px',
+    letterSpacing: '2px',
+    fontFamily: '"Georgia", serif'
+  },
+  landingTagline: {
+    fontSize: '20px',
+    color: '#8B7355',
+    fontStyle: 'italic',
+    marginBottom: '40px',
+    fontWeight: '300'
+  },
+  landingInstructions: {
+    marginBottom: '40px',
+    textAlign: 'left'
+  },
+  instructionsTitle: {
+    fontSize: '28px',
+    fontWeight: '600',
+    color: '#5C4033',
+    marginBottom: '30px',
+    textAlign: 'center',
+    letterSpacing: '0.5px'
+  },
+  instructionCard: {
+    display: 'flex',
+    gap: '20px',
+    marginBottom: '25px',
+    padding: '20px',
+    backgroundColor: '#FFFBF5',
+    borderRadius: '4px',
+    border: '1px solid #E8E3D8'
+  },
+  stepNumber: {
+    minWidth: '50px',
+    height: '50px',
+    backgroundColor: '#DAA520',
+    color: '#FAF8F3',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '24px',
+    fontWeight: '700',
+    flexShrink: 0,
+    fontFamily: '"Georgia", serif'
+  },
+  instructionCardTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#5C4033',
+    marginBottom: '8px'
+  },
+  instructionCardText: {
+    fontSize: '16px',
+    color: '#6B6B6B',
+    lineHeight: '1.6',
+    fontFamily: '"Georgia", serif'
+  },
+  warningBox: {
+    backgroundColor: '#FEF3C7',
+    border: '2px solid #F59E0B',
+    padding: '20px',
+    borderRadius: '4px',
+    marginBottom: '30px',
+    fontSize: '16px',
+    color: '#92400E',
+    fontFamily: '"Georgia", serif',
+    lineHeight: '1.6'
+  },
+  startButton: {
+    width: '100%',
+    backgroundColor: '#8B7355',
+    color: '#FAF8F3',
+    padding: '18px',
+    borderRadius: '4px',
+    fontSize: '18px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    border: '2px solid #6B5344',
+    fontFamily: '"Georgia", serif',
+    letterSpacing: '0.5px',
+    marginTop: '10px'
+  },
+  backButton: {
+    padding: '10px 20px',
+    backgroundColor: '#DAA520',
+    color: '#3D3D3D',
+    border: 'none',
+    borderRadius: '4px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontFamily: '"Georgia", serif'
+  },
+  navbar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '15px',
+    marginBottom: '20px',
+    position: 'relative'
   },
   logo: {
     height: '60px',

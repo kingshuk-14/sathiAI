@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "buildCommand": "npm install && npm run build",
+  "framework": "vite",
+  "public": false,
+  "env": {
+    "VITE_LLM_API_KEY": "@vite_llm_api_key"
+  },
+  "functions": {
+    "api/chat.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": []
+}
