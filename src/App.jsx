@@ -676,28 +676,39 @@ ${text}
     return sections
   }
 
-  // Get scam level for meter - based on confidence NOT just presence of word "scam"
+  // Get scam level for meter - based on specific keywords in correct priority order
   const getScamLevel = (scamText) => {
     const lower = scamText.toLowerCase()
     
-    // HIGH RISK (RED) - Strong confidence it's a scam
-    if (lower.includes('definitely scam') || lower.includes('definitely a scam') || 
-        (lower.includes('likely scam') && !lower.includes('if'))) {
-      return 'high'
-    }
-    
-    // LOW RISK (GREEN) - Unlikely/Not a scam
-    if (lower.includes('unlikely') || lower.includes('no scam') || lower.includes('not a scam')) {
+    // Check for UNLIKELY first (highest priority) - GREEN
+    if (lower.includes('unlikely scam') || lower.includes('unlikely') || 
+        lower.includes('no scam') || lower.includes('not a scam') ||
+        lower.includes('not likely a scam') || lower.includes('not scam')) {
       return 'low'
     }
     
-    // MEDIUM RISK (YELLOW) - Could be, probably, possibly
-    if (lower.includes('could be') || lower.includes('probably') || lower.includes('possibly') ||
-        lower.includes('may be') || lower.includes('might be') || lower.includes('if')) {
+    // Check for DEFINITELY/CLEARLY SCAM - RED (high priority after unlikely)
+    if (lower.includes('definitely scam') || lower.includes('definitely a scam') || 
+        lower.includes('clearly scam') || lower.includes('confirmed scam')) {
+      return 'high'
+    }
+    
+    // Check for LIKELY SCAM without modifiers - RED
+    if (lower.includes('likely scam') && !lower.includes('unlikely') && 
+        !lower.includes('not likely') && !lower.includes('if')) {
+      return 'high'
+    }
+    
+    // Check for POSSIBLY/MAYBE - YELLOW (medium priority)
+    if (lower.includes('possibly scam') || lower.includes('could be scam') || 
+        lower.includes('may be scam') || lower.includes('might be scam') ||
+        lower.includes('verify')) {
       return 'medium'
     }
     
-    // Default to medium
+    // Default to medium if unclear
+    return 'medium'
+  }
     return 'medium'
   }
 
@@ -902,9 +913,9 @@ ${text}
                           components={{
                             strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
                             em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
-                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
-                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
-                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px', fontSize: '14px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.6', fontSize: '14px'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.6', fontSize: '14px'}} {...props} />
                           }}
                         >
                           {sections.scam}
@@ -931,9 +942,9 @@ ${text}
                           components={{
                             strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
                             em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
-                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
-                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
-                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px', fontSize: '14px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.6', fontSize: '14px'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.6', fontSize: '14px'}} {...props} />
                           }}
                         >
                           {sections.importance}
@@ -951,9 +962,9 @@ ${text}
                           components={{
                             strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
                             em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
-                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
-                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
-                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px', fontSize: '14px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.6', fontSize: '14px'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.6', fontSize: '14px'}} {...props} />
                           }}
                         >
                           {sections.about}
@@ -971,9 +982,9 @@ ${text}
                           components={{
                             strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
                             em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
-                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
-                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
-                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px', fontSize: '14px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.6', fontSize: '14px'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.6', fontSize: '14px'}} {...props} />
                           }}
                         >
                           {sections.action}
@@ -1015,7 +1026,7 @@ const styles = {
     backgroundColor: '#F5F1E8',
     padding: '30px 20px',
     fontFamily: '"Georgia", "Garamond", serif',
-    fontSize: '18px'
+    fontSize: '14px'
   },
   // Landing Page Styles
   landingPage: {
@@ -1330,8 +1341,8 @@ const styles = {
     padding: '20px'
   },
   cardText: {
-    fontSize: '16px',
-    lineHeight: '1.8',
+    fontSize: '14px',
+    lineHeight: '1.7',
     color: '#3D3D3D',
     fontFamily: '"Georgia", serif',
     margin: '12px 0 0 0',
@@ -1375,8 +1386,8 @@ const styles = {
     paddingBottom: '12px'
   },
   responseContent: {
-    fontSize: '17px',
-    lineHeight: '2',
+    fontSize: '14px',
+    lineHeight: '1.8',
     color: '#3D3D3D',
     fontFamily: '"Georgia", serif'
   },
