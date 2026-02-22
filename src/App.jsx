@@ -709,8 +709,6 @@ ${text}
     // Default to medium if unclear
     return 'medium'
   }
-    return 'medium'
-  }
 
   // Get urgency level
   const getUrgencyLevel = (importanceText) => {
