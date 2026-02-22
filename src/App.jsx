@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Tesseract from 'tesseract.js'
+import ReactMarkdown from 'react-markdown'
 
 const App = () => {
   // Configuration - no need to expose API key to frontend
@@ -797,7 +798,17 @@ ${text}
                             {scamLevel === 'low' && 'LOW RISK'}
                           </div>
                         </div>
-                        <p style={styles.cardText}>{sections.scam}</p>
+                        <ReactMarkdown 
+                          components={{
+                            strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
+                            em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                          }}
+                        >
+                          {sections.scam}
+                        </ReactMarkdown>
                       </div>
                     </div>
 
@@ -816,7 +827,17 @@ ${text}
                           {urgencyLevel === 'medium' && 'MEDIUM'}
                           {urgencyLevel === 'low' && 'LOW'}
                         </div>
-                        <p style={styles.cardText}>{sections.importance}</p>
+                        <ReactMarkdown 
+                          components={{
+                            strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
+                            em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                          }}
+                        >
+                          {sections.importance}
+                        </ReactMarkdown>
                       </div>
                     </div>
 
@@ -826,7 +847,17 @@ ${text}
                         <h3 style={styles.cardTitle}>What This Message Means</h3>
                       </div>
                       <div style={styles.cardContent}>
-                        <p style={styles.cardText}>{sections.about}</p>
+                        <ReactMarkdown 
+                          components={{
+                            strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
+                            em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                          }}
+                        >
+                          {sections.about}
+                        </ReactMarkdown>
                       </div>
                     </div>
 
@@ -836,7 +867,17 @@ ${text}
                         <h3 style={styles.cardTitle}>What You Should Do</h3>
                       </div>
                       <div style={styles.cardContent}>
-                        <p style={styles.cardText}>{sections.action}</p>
+                        <ReactMarkdown 
+                          components={{
+                            strong: ({node, ...props}) => <strong style={{fontWeight: '700', color: '#C1272D'}} {...props} />,
+                            em: ({node, ...props}) => <em style={{fontStyle: 'italic', color: '#8B7355'}} {...props} />,
+                            ul: ({node, ...props}) => <ul style={{marginLeft: '25px', marginTop: '10px'}} {...props} />,
+                            li: ({node, ...props}) => <li style={{marginBottom: '8px', lineHeight: '1.8'}} {...props} />,
+                            p: ({node, ...props}) => <p style={{marginBottom: '12px', lineHeight: '1.8'}} {...props} />
+                          }}
+                        >
+                          {sections.action}
+                        </ReactMarkdown>
                       </div>
                     </div>
                   </>
