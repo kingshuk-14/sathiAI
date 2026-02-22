@@ -46,6 +46,41 @@ const App = () => {
   }, [])
 
   // Handle image upload and OCR
+  // Clean OCR extracted text for better analysis
+  const cleanOCRText = (text) => {
+    if (!text) return ''
+    
+    // 1. Remove extra spaces and tabs
+    let cleaned = text.replace(/\s+/g, ' ')
+    
+    // 2. Fix common OCR artifacts and junk characters
+    cleaned = cleaned.replace(/[|!]/g, '') // Remove OCR noise characters
+    
+    // 3. Split by sentence/paragraph markers and normalize line breaks
+    // Sentences typically end with . ! ? or followed by capital letters
+    cleaned = cleaned.replace(/([.!?])\s+([A-Z])/g, '$1\n$2')
+    
+    // 4. Keep line breaks for actual section headers (all caps or numbered)
+    cleaned = cleaned.replace(/([0-9]+\.|[A-Z][A-Z\s]+)(\s+[A-Z])/g, '$1\n$2')
+    
+    // 5. Fix spacing around common punctuation
+    cleaned = cleaned.replace(/\s+([.,:!?])/g, '$1')
+    cleaned = cleaned.replace(/([.,:!?])\s*/g, '$1 ')
+    
+    // 6. Remove duplicate spaces
+    cleaned = cleaned.replace(/\s+/g, ' ')
+    
+    // 7. Clean up header/meta information that might confuse classification
+    // Remove common OCR headers that don't contain real message content
+    cleaned = cleaned.replace(/^.*?(website|email|phone|contact|:)\s+.*?\n/gim, '')
+    
+    // 8. Consolidate multiple newlines into single breaks
+    cleaned = cleaned.replace(/\n\s*\n+/g, '\n')
+    
+    // 9. Trim and return
+    return cleaned.trim()
+  }
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -56,9 +91,10 @@ const App = () => {
 
     try {
       const result = await Tesseract.recognize(file, 'eng')
-      const text = result.data.text
-      setExtractedText(text)
-      setInputText(text)
+      const rawText = result.data.text
+      const cleanedText = cleanOCRText(rawText)
+      setExtractedText(cleanedText)
+      setInputText(cleanedText)
     } catch (err) {
       setError('Failed to read image. Please try again or paste text instead.')
       console.error(err)
