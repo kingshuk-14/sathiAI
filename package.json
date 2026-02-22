@@ -1,0 +1,25 @@
+{
+  "name": "sathiAI",
+  "version": "1.0.0",
+  "description": "AI-powered message explanation app for older users",
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "node-fetch": "^3.3.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tesseract.js": "^5.0.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^9.2.1",
+    "vite": "^4.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"node backend.js\" \"vite\"",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
