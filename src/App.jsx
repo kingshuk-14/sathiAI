@@ -50,34 +50,73 @@ const App = () => {
   const cleanOCRText = (text) => {
     if (!text) return ''
     
+    let cleaned = text
+    
+    // Check if this looks like a NOTICE document
+    const isNotice = /NOTICE|notice/i.test(cleaned)
+    
+    if (isNotice) {
+      // For notices: Extract content between "NOTICE" and closing phrases
+      
+      // 1. Find content after NOTICE keyword
+      const noticeMatch = cleaned.match(/NOTICE[\s\S]*?((?:THANK YOU|THANKS|REGARDS|SINCERELY|YOURS|Principal|Signature)[\s\S]*)?$/i)
+      if (noticeMatch) {
+        cleaned = noticeMatch[0] // Keep from NOTICE to end
+      }
+      
+      // 2. Extract school name (usually in first few lines before NOTICE)
+      const schoolMatch = text.match(/([A-Z][A-Z\s]+(?:SCHOOL|COLLEGE|UNIVERSITY))/i)
+      const schoolName = schoolMatch ? schoolMatch[1].trim() : ''
+      
+      // 3. Check for signature indicators (Principal name, signature seal, stamp)
+      const hasSignature = /signature|principal|seal|stamp|authorized|signed|✓|✗|√/i.test(cleaned)
+      const signatureText = hasSignature ? ' [Verified with official signature]' : ''
+      
+      // 4. Remove extra header/footer info but keep core message
+      cleaned = cleaned.replace(/website\s*:.*$/gim, '')
+      cleaned = cleaned.replace(/e-?mail\s*:.*$/gim, '')
+      cleaned = cleaned.replace(/phone\s*:.*$/gim, '')
+      cleaned = cleaned.replace(/abb\.?no|school code|ph\.?no/gi, '')
+      
+      // 5. Clean up but preserve structure for notices
+      cleaned = cleaned.replace(/\s+/g, ' ') // Normalize spaces
+      cleaned = cleaned.replace(/([.!?])\s+([A-Z])/g, '$1\n$2') // Keep sentence breaks
+      cleaned = cleaned.replace(/\n\s*\n+/g, '\n') // Clean multiple newlines
+      
+      // 6. Add school name prefix if found and signature verification
+      if (schoolName) {
+        cleaned = `From: ${schoolName}\n\n${cleaned}${signatureText}`
+      }
+      
+      return cleaned.trim()
+    }
+    
+    // For non-notices: Use general cleaning logic
     // 1. Remove extra spaces and tabs
-    let cleaned = text.replace(/\s+/g, ' ')
+    cleaned = cleaned.replace(/\s+/g, ' ')
     
     // 2. Fix common OCR artifacts and junk characters
-    cleaned = cleaned.replace(/[|!]/g, '') // Remove OCR noise characters
+    cleaned = cleaned.replace(/[|]/g, '') // Remove OCR noise characters
     
     // 3. Split by sentence/paragraph markers and normalize line breaks
-    // Sentences typically end with . ! ? or followed by capital letters
     cleaned = cleaned.replace(/([.!?])\s+([A-Z])/g, '$1\n$2')
     
-    // 4. Keep line breaks for actual section headers (all caps or numbered)
+    // 4. Keep line breaks for actual section headers
     cleaned = cleaned.replace(/([0-9]+\.|[A-Z][A-Z\s]+)(\s+[A-Z])/g, '$1\n$2')
     
-    // 5. Fix spacing around common punctuation
+    // 5. Fix spacing around punctuation
     cleaned = cleaned.replace(/\s+([.,:!?])/g, '$1')
     cleaned = cleaned.replace(/([.,:!?])\s*/g, '$1 ')
     
     // 6. Remove duplicate spaces
     cleaned = cleaned.replace(/\s+/g, ' ')
     
-    // 7. Clean up header/meta information that might confuse classification
-    // Remove common OCR headers that don't contain real message content
+    // 7. Remove meta information
     cleaned = cleaned.replace(/^.*?(website|email|phone|contact|:)\s+.*?\n/gim, '')
     
-    // 8. Consolidate multiple newlines into single breaks
+    // 8. Consolidate multiple newlines
     cleaned = cleaned.replace(/\n\s*\n+/g, '\n')
     
-    // 9. Trim and return
     return cleaned.trim()
   }
 
