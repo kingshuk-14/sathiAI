@@ -78,6 +78,21 @@ const App = () => {
     const hasLink = /http|\.com|\.co\.in|link/.test(lower)
     const hasUrgency = /urgent|today|immediately|blocked|suspended|action required|asap/.test(lower)
     const isTransactionAlert = /debited|credited|debit|credit|transaction|amount|rs\.|rupees|₹|paid|received|transfer/.test(lower)
+    
+    // Check for legitimate company indicators
+    const isFromOfficialCompany = /flipkart|amazon|myntra|snapdeal|swiggy|zomato|uber|ola|netflix|disney\+|google|microsoft|apple|bank|insurance|government|railway|irctc|postal|aadhaar/.test(lower)
+    const isPromotional = /discount|sale|offer|promotion|upto|save|coupon|deal|exclusive|limited time|weekend|special/.test(lower)
+    const isInformational = /alert|update|notification|confirm|verify|new|available|starting|ending|scheduled|maintenance/.test(lower)
+
+    // PROMOTIONAL/SALE MESSAGES - Usually legitimate if from official company
+    if (isFromOfficialCompany && isPromotional && !(/click|verify|confirm|password|otp|card details|personal info|send money|transfer/.test(lower))) {
+      return {
+        category: 'promotional',
+        hasLink,
+        hasUrgency,
+        riskDefault: 'low'
+      }
+    }
 
     // 1. BANK - KYC, account, net banking, cards, transactions
     if (/kyc|account blocked|net banking|debit card|credit card|bank account|re-login|verify account|update details|transaction alert|sbi|hdfc|icici|axis|rbi|upi/.test(lower)) {
@@ -129,8 +144,8 @@ const App = () => {
       }
     }
 
-    // 6. OBVIOUS SCAM - lottery, prize, crypto
-    if (/lottery|won prize|claim reward|processing fee|send bank details|urgent payment|bitcoin|crypto payment|transfer money|lottery winner/.test(lower)) {
+    // 6. OBVIOUS SCAM - lottery, prize, crypto - strong indicators
+    if (/lottery|won prize|claim reward|processing fee|send bank details|urgent payment|bitcoin|crypto payment|transfer money|lottery winner|congratulations you have won/.test(lower)) {
       return {
         category: 'scam',
         hasLink,
@@ -238,37 +253,52 @@ ${text}
   }
 
   const buildNoticePrompt = (text) => {
-    return `You are helping an older adult understand an informational notice. Keep it simple and clear.
+    return `You are helping an older adult understand an informational notice or promotional message.
 
-NOTICE MESSAGE RULES:
-- Usually safe and informational
-- Flag only if contains payment/login requests
-- Focus on explaining the information
+LEGITIMATE NOTICE/PROMO INDICATORS:
+- From known company (Flipkart, Amazon, official org names)
+- Professional format matching company style
+- Offers discounts, sales, or informational updates
+- No urgent pressure or threats
+- Not requesting personal information or immediate action
+
+SCAM INDICATORS:
+- Unknown sender or random number
+- Poor grammar/spelling
+- Urgent pressure language
+- Requests OTP, password, personal details
+- Suspicious links or domains
+- Too-good-to-be-true offers
 
 Your response MUST follow this exact structure:
 
 1. IS THIS LIKELY A SCAM?
-   Say: Unlikely
-   Explain: This appears to be official information
-   Flag if: Contains payment or login request (then: Possibly scam)
+   If FROM known company + informational/promotional: Say "Unlikely scam"
+   If FROM unknown sender + pressure tactics: Say "Likely scam"
+   If mixing signals: Say "Possibly - verify sender"
+   Explain: Is the sender credible? Does format match official style?
 
 2. IS THIS IMPORTANT?
-   Say: Low or Medium urgency
-   Explain: This is informational about schedules/closures
-   Warn if: Urgent action required (then: Medium)
+   Say: Low urgency (if promotional/announcement)
+   Say: Medium urgency (if action-required notice)
+   Say: High urgency (if security-related or unusual)
+   Explain: Does this need your immediate attention?
 
 3. WHAT THIS MESSAGE IS ABOUT:
-   Explain what the notice is announcing
-   Explain who it affects (students/staff/public)
-   List key details (dates, times, locations)
+   Explain: What company or organization sent this?
+   Explain: What is being announced or promoted?
+   Explain: Any action required from you?
 
 4. WHAT SHOULD I DO?
-   Note down the key information
-   Keep the message safe (you may need it later)
-   Follow the instructions if any action needed
-   Ask at school/office if you have questions
+   If legitimate promotion: You can use the offer on their official app/website
+   If announcement: Note down the information if relevant
+   If asking for action: Go to official website/app directly (don't click links)
+   Never share: OTP, passwords, or personal info via message links
+   When unsure: Contact company directly or visit official website
 
-Universal Rules: Use simple language. No asterisks. Be clear and helpful.
+Key tip: Legitimate companies notify from official sources. Check the sender's name/number against official company contacts before taking action.
+
+Universal Rules: Use simple language. No asterisks. Verify sender credibility first.
 
 Message:
 """
@@ -321,36 +351,49 @@ ${text}
   const buildDeliveryPrompt = (text) => {
     return `You are helping an older adult understand a delivery message about packages/orders.
 
-DELIVERY MESSAGE RULES:
-- Flag as scam if: link + payment request
-- Usually safe if: just tracking info
-- NEVER click suspicious delivery links
+DELIVERY MESSAGE RULES ANALYSIS:
+LEGITIMATE INDICATORS (favor "Unlikely scam"):
+- Message from official company name (Flipkart, Amazon, etc.)
+- Professional tone and format (matches company style)
+- Offer or promotion mention (sales, discounts)
+- No urgency/pressure to take action immediately
+- Informational only - not requesting personal info or payment
+
+SCAM INDICATORS (flag "Possibly/Likely scam"):
+- Demands urgent action or payment
+- Requests personal info (OTP, card details)
+- Contains suspicious shortened links or unknown domains
+- Poor grammar or spelling (indicates spam)
+- Sender unknown/random number instead of company name
+- Threatening language or fake consequences
 
 Your response MUST follow this exact structure:
 
 1. IS THIS LIKELY A SCAM?
-   Say: Unlikely (if tracking update only)
-   Say: Possibly scam (if payment/link requested)
-   Explain: Scammers use fake delivery messages to steal money
+   If FROM official company + promotional/informational: Say "Unlikely scam"
+   If FROM unknown sender + requests payment/info: Say "Likely scam"
+   If MIXED signals: Say "Possibly scam - verify source"
+   Explain your reasoning based on sender credibility and content
 
 2. IS THIS IMPORTANT?
-   Say: Low urgency (if tracking only)
-   Say: High urgency (if payment requested)
-   Explain: Real companies don't ask for payment via random links
+   Say: Low to Medium urgency (if tracking/promo only)
+   Say: High urgency (if payment/personal info requested)
+   Explain: Is this asking you to take action or just informing you?
 
 3. WHAT THIS MESSAGE IS ABOUT:
-   Explain: Package/parcel status update
-   Explain: Delivery date or tracking info
-   Flag: Any payment or suspicious link request
+   Explain: What company/service is this about?
+   Explain: What offer or update is being shared?
+   Flag: Any unusual requests or red flags
 
 4. WHAT SHOULD I DO?
-   Check: Did you order this package?
-   Wait: Delivery company will deliver it
-   Do NOT click: Links from messages
-   Open: Official website or app directly to track
-   If payment asked: Contact company directly instead
+   If promotional/tracking: Open official app or website directly to verify
+   If payment requested: Contact company directly instead (use official number)
+   Never share: OTP, password, card details via SMS links
+   Verify source: Check if message matches official company style
 
-Universal Rules: Use simple language. No asterisks. Safety first.
+Key tip: Official companies send from known numbers/apps. If you're unsure, visit the official website directly instead of clicking message links.
+
+Universal Rules: Use simple language. No asterisks. Consider sender credibility.
 
 Message:
 """
@@ -438,6 +481,61 @@ ${text}
 """`
   }
 
+  const buildPromotionalPrompt = (text) => {
+    return `You are helping an older adult understand a promotional or sale message from an official company.
+
+PROMOTIONAL MESSAGE ANALYSIS:
+LEGITIMATE INDICATORS:
+- From known company (Flipkart, Amazon, etc.)
+- About sale, discount, or special offer
+- No urgent pressure or threats
+- Informational in tone (not demanding action)
+- Professional format
+
+This is likely NOT a scam because:
+- Sent by official company
+- About normal business promotions
+- Not requesting personal info
+
+Your response MUST follow this exact structure:
+
+1. IS THIS LIKELY A SCAM?
+   Say: Unlikely scam
+   Explain: This is a legitimate promotion from a known company
+   Note: Companies regularly send sale/discount notifications
+   Assurance: This is normal business communication
+
+2. IS THIS IMPORTANT?
+   Say: Low to Medium urgency
+   Explain: This is informational about a sale or offer
+   Note: You can use it if interested, but not urgent
+
+3. WHAT THIS MESSAGE IS ABOUT:
+   Explain: What company is offering this?
+   Explain: What is the promotion (sale, discount, offer)?
+   Explain: When does it run (dates/time)?
+   Explain: What products or services are included?
+
+4. WHAT SHOULD I DO?
+   If interested: Open the official app or website directly (don't click message links)
+   If not interested: You can delete it or ignore it
+   To verify: Check the official app or website for the same promotion
+   How to shop: Use the official app/website, never click external links
+
+Key tips:
+- Official companies send promotions regularly
+- Always verify offers through official apps/websites
+- Don't worry if you miss a sale - more will come
+- Safe to ignore if not interested
+
+Universal Rules: Use simple language. No asterisks. This is normal marketing.
+
+Message:
+"""
+${text}
+"""`
+  }
+
   // Select prompt based on classification
   const selectPrompt = (text) => {
     const classification = classifyMessage(text)
@@ -449,6 +547,8 @@ ${text}
         return buildMedicalPrompt(text)
       case 'notice':
         return buildNoticePrompt(text)
+      case 'promotional':
+        return buildPromotionalPrompt(text)
       case 'otp':
         return buildOTPPrompt(text)
       case 'delivery':
