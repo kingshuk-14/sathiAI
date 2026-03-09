@@ -34,7 +34,7 @@ app.post('/api/huggingface/chat/completions', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'mistralai/Mistral-7B-Instruct-v0.2',
+        model: 'mistralai/Mistral-7B-Instruct-v0.2:featherless-ai',
         messages: messages,
         temperature: 0.7,
         max_tokens: 1000
@@ -83,7 +83,7 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: model || 'mistralai/Mistral-7B-Instruct-v0.2',
+        model: model || 'mistralai/Mistral-7B-Instruct-v0.2:featherless-ai',
         messages: messages,
         temperature: temperature || 0.7,
         max_tokens: max_tokens || 1000

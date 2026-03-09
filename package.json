@@ -4,6 +4,7 @@
   "description": "AI-powered message explanation app for older users",
   "type": "module",
   "dependencies": {
+    "@huggingface/inference": "^4.13.15",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",

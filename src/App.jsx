@@ -652,7 +652,7 @@ ${text}
 
     try {
       const requestBody = {
-        model: 'mistralai/Mistral-7B-Instruct-v0.2',
+        model: 'mistralai/Mistral-7B-Instruct-v0.2:featherless-ai',
         messages: [
           {
             role: 'user',
